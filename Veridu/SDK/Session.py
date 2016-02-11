@@ -29,15 +29,14 @@ class Session(object):
         return self.username
 
     def create(self, readOnly=False):
-        if self.api.getSession() is None:
-            if readOnly:
-                json = self.api.signedFetch("POST", "session/read")
-            else:
-                json = self.api.signedFetch("POST", "session/write")
+        if readOnly:
+            json = self.api.signedFetch("POST", "session/read")
+        else:
+            json = self.api.signedFetch("POST", "session/write")
 
-            self.api.setSession(json["token"])
-            self.setToken(json["token"])
-            self.setExpires(json["expires"])
+        self.api.setSession(json["token"])
+        self.setToken(json["token"])
+        self.setExpires(json["expires"])
 
     def extend(self):
         if self.token is None:

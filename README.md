@@ -17,7 +17,6 @@ Dependencies:
  * random
  * re
  * requests
- * requests
  * time
  * urllib
  * urlparse

@@ -21,7 +21,7 @@ class API(object):
         self.session = None
         self.headers = {
             "Veridu-Client": key,
-            "User-Agent": "Veridu-Python/0.1.1"
+            "User-Agent": "Veridu-Python/0.1.2"
         }
 
     def setSession(self, session):
