@@ -1,5 +1,9 @@
-import urlparse
-import urllib
+import sys
+if sys.version_info > (2, 7):
+    from urllib.parse import urlencode, urljoin
+else:
+    from urlparse import urljoin
+    from urllib import urlencode
 import requests
 import random
 import time
@@ -16,7 +20,10 @@ class API(object):
 
     def __init__(self, key, secret, version="0.3"):
         self.key = key
-        self.secret = secret
+        if sys.version_info > (2, 7):
+            self.secret = secret.encode('utf-8')
+        else:
+            self.secret = secret
         self.version = version
         self.session = None
         self.headers = {
@@ -46,13 +53,15 @@ class API(object):
             "timestamp": int(time.time()),
             "version": self.version
         }
-        payload = urllib.urlencode(collections.OrderedDict(sorted(rawPayload.items())))
+        payload = urlencode(collections.OrderedDict(sorted(rawPayload.items())))
+        if sys.version_info > (2, 7):
+            payload = payload.encode('utf-8')
         hmacInstance = hmac.new(self.secret, msg=payload, digestmod=hashlib.sha1)
         rawPayload["signature"] = hmacInstance.hexdigest()
         return rawPayload
 
     def fetch(self, method, resource, data=None):
-        baseUrl = urlparse.urljoin("https://api.veridu.com", "/%s/%s" % (self.version, resource))
+        baseUrl = urljoin("https://api.veridu.com", "/%s/%s" % (self.version, resource))
 
         if (method == "GET"):
             response = requests.get(baseUrl, params=data, headers=self.headers)
@@ -78,7 +87,7 @@ class API(object):
     def signedFetch(self, method, resource, data=None):
         sign = self.createSignature(
             method,
-            urlparse.urljoin("https://api.veridu.com", "/%s/%s" % (self.version, resource))
+            urljoin("https://api.veridu.com", "/%s/%s" % (self.version, resource))
         )
 
         if data is None:
